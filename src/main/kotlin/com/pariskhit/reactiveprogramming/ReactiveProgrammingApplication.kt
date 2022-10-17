@@ -8,4 +8,5 @@ class ReactiveProgrammingApplication
 
 fun main(args: Array<String>) {
 	runApplication<ReactiveProgrammingApplication>(*args)
+
 }
