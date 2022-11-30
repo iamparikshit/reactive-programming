@@ -45,7 +45,7 @@ class FluxAndMonoServicesTest{
     }
 
     @Test
-    fun `should retrun flux of string with filter operator`() {
+    fun `should return flux of string with filter operator`() {
         val languageFlux = fluxAndMonoServices.languageFluxFilter()
 
         StepVerifier.create(languageFlux)
@@ -68,6 +68,24 @@ class FluxAndMonoServicesTest{
 
         StepVerifier.create(language)
             .expectNext()
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return flux of string with flatmap operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxFlatMap()
+
+        StepVerifier.create(languageFlux)
+            .expectNextCount(39)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with flatMap operator`() {
+        val language = fluxAndMonoServices.languageMonoFlatMap()
+
+        StepVerifier.create(language)
+            .expectNextCount(1)
             .verifyComplete()
     }
 }

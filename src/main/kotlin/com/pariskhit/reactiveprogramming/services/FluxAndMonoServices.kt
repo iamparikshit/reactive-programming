@@ -42,4 +42,21 @@ class FluxAndMonoServices {
             .log()
     }
 
+    fun languageFluxFlatMap(): Flux<String> {
+        return Flux.fromIterable(languages)
+            .filter { it.length > maxLengthOfLanguage }
+            .map { it.uppercase() }
+            .flatMap{ Flux.fromIterable(it.split("")) }
+            .log()
+    }
+
+    fun languageMonoFlatMap(maxLength : Int  = maxLengthOfLanguage): Mono<List<String>> {
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .filter { it?.length?: 0 > maxLength }
+            .map { it?.uppercase() }
+            .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
+            .log()
+    }
+
 }
