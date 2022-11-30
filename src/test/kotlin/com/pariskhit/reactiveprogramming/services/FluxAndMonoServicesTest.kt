@@ -85,7 +85,16 @@ class FluxAndMonoServicesTest{
         val language = fluxAndMonoServices.languageMonoFlatMap()
 
         StepVerifier.create(language)
-            .expectNextCount(1)
+            .expectNext(listOf("S","P","A","N","I","S","H"))
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with flatMapMany operator`() {
+        val language = fluxAndMonoServices.languageMonoFlatMapMany()
+
+        StepVerifier.create(language)
+            .expectNext("SPANISH")
             .verifyComplete()
     }
 }

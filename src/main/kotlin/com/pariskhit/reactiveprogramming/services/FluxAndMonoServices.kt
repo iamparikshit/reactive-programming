@@ -59,4 +59,13 @@ class FluxAndMonoServices {
             .log()
     }
 
+    fun languageMonoFlatMapMany(maxLength : Int  = maxLengthOfLanguage): Flux<String> {
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .filter { it?.length?: 0 > maxLength }
+            .map { it?.uppercase() }
+            .flatMapMany { it?.let { it1 -> Mono.just(it1) } }
+            .log()
+    }
+
 }
