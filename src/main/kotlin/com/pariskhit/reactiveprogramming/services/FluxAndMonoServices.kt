@@ -247,4 +247,21 @@ class FluxAndMonoServices {
             .log()
     }
 
+    fun languageFluxMergeWithSequential(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        val oldLanguages = Flux.just("Spanish", "German")
+            .delayElements(Duration.ofMillis(90))
+        val newLanguages =  Flux.just("English", "Japanese")
+
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .switchIfEmpty(Flux.mergeSequential(oldLanguages,newLanguages))
+            .log()
+    }
+
 }

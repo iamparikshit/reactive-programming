@@ -198,11 +198,20 @@ class FluxAndMonoServicesTest{
     }
 
     @Test
-    fun `should return mono of string with mergeWith operator`() {
+    fun `should return flux for mono of string with mergeWith operator`() {
         val language = fluxAndMonoServices.languageMonoMergeWith(11)
 
         StepVerifier.create(language)
             .expectNext(listOf("ENGLISH"),listOf("DEFAULT_LANGUAGE"))
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return flux of string with mergeSequntial operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxMergeWithSequential(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("Spanish","German","English","Japanese")
             .verifyComplete()
     }
 }
