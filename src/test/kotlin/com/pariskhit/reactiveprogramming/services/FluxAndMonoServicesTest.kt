@@ -85,7 +85,7 @@ class FluxAndMonoServicesTest{
         val language = fluxAndMonoServices.languageMonoFlatMap()
 
         StepVerifier.create(language)
-            .expectNext(listOf("S","P","A","N","I","S","H"))
+            .expectNextCount(1)
             .verifyComplete()
     }
 
@@ -131,6 +131,51 @@ class FluxAndMonoServicesTest{
 
         StepVerifier.create(language)
             .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return flux of string with switchIfEmpty operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxSwitchIfEmpty(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("DEFAULT_LANGUAGE")
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with switchIfEmpty operator`() {
+        val language = fluxAndMonoServices.languageMonoSwitchIfEmpty(11)
+
+        StepVerifier.create(language)
+            .expectNext(listOf("DEFAULT_LANGUAGE"))
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return flux of string with concat operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxConcat(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("Spanish","German","English","Japanese")
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return flux of string with concatWith operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxConcatWith(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("Spanish","German","English","Japanese")
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with concatWith operator`() {
+        val language = fluxAndMonoServices.languageMonoConcatWith(11)
+
+        StepVerifier.create(language)
+            .expectNext(listOf("DEFAULT_LANGUAGE"), listOf("ENGLISH"))
             .verifyComplete()
     }
 }

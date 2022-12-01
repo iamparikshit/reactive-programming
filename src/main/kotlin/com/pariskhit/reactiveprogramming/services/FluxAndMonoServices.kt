@@ -119,4 +119,81 @@ class FluxAndMonoServices {
             .log()
     }
 
+    fun languageFluxSwitchIfEmpty(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .switchIfEmpty(Flux.just("DEFAULT_LANGUAGE"))
+            .log()
+    }
+
+
+    fun languageMonoSwitchIfEmpty(maxLength : Int = maxLengthOfLanguage): Mono<List<String>> {
+        fun filterData(input: Mono<String?>): Mono<String?> {
+            return input?.filter { it?.length ?: 0 > maxLength }
+        }
+
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .transform { filterData(it) }
+            .map { it?.uppercase() }
+            .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
+            .switchIfEmpty(Mono.just(listOf("DEFAULT_LANGUAGE")))
+            .log()
+    }
+
+    fun languageFluxConcat(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        val oldLanguages = Flux.just("Spanish","German")
+        val newLanguages =  Flux.just("English", "Japanese")
+
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .switchIfEmpty(Flux.concat(oldLanguages,newLanguages))
+            .log()
+    }
+
+    fun languageFluxConcatWith(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        val newLanguages =  Flux.just("English", "Japanese")
+
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .switchIfEmpty(Flux.just("Spanish","German"))
+            .concatWith(newLanguages)
+            .log()
+    }
+
+    fun languageMonoConcatWith(maxLength : Int = maxLengthOfLanguage): Flux<List<String>> {
+        val newLanguages =  Mono.just(listOf("ENGLISH"))
+        fun filterData(input: Mono<String?>): Mono<String?> {
+            return input?.filter { it?.length ?: 0 > maxLength }
+        }
+
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .transform { filterData(it) }
+            .map { it?.uppercase() }
+            .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
+            .switchIfEmpty(Mono.just(listOf("DEFAULT_LANGUAGE")))
+            .concatWith(newLanguages)
+            .log()
+    }
+
+
 }
