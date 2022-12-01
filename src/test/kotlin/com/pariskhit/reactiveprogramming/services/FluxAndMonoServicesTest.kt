@@ -97,4 +97,22 @@ class FluxAndMonoServicesTest{
             .expectNext("SPANISH")
             .verifyComplete()
     }
+
+    @Test
+    fun `should return flux of string with transform operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxTransform()
+
+        StepVerifier.create(languageFlux)
+            .expectNextCount(39)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with transform operator`() {
+        val language = fluxAndMonoServices.languageMonoTransform()
+
+        StepVerifier.create(language)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
 }

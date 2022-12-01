@@ -34,10 +34,10 @@ class FluxAndMonoServices {
             .log()
     }
 
-    fun languageMonoFilter(maxLength : Int  = maxLengthOfLanguage): Mono<String?> {
+    fun languageMonoFilter(maxLength: Int = maxLengthOfLanguage): Mono<String?> {
         return Mono.just(languages)
             .map { it.firstOrNull() }
-            .filter { it?.length?: 0 > maxLength }
+            .filter { it?.length ?: 0 > maxLength }
             .map { it?.uppercase() }
             .log()
     }
@@ -46,25 +46,50 @@ class FluxAndMonoServices {
         return Flux.fromIterable(languages)
             .filter { it.length > maxLengthOfLanguage }
             .map { it.uppercase() }
-            .flatMap{ Flux.fromIterable(it.split("")) }
+            .flatMap { Flux.fromIterable(it.split("")) }
             .log()
     }
 
-    fun languageMonoFlatMap(maxLength : Int  = maxLengthOfLanguage): Mono<List<String>> {
+    fun languageMonoFlatMap(maxLength: Int = maxLengthOfLanguage): Mono<List<String>> {
         return Mono.just(languages)
             .map { it.firstOrNull() }
-            .filter { it?.length?: 0 > maxLength }
+            .filter { it?.length ?: 0 > maxLength }
             .map { it?.uppercase() }
             .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
             .log()
     }
 
-    fun languageMonoFlatMapMany(maxLength : Int  = maxLengthOfLanguage): Flux<String> {
+    fun languageMonoFlatMapMany(maxLength: Int = maxLengthOfLanguage): Flux<String> {
         return Mono.just(languages)
             .map { it.firstOrNull() }
-            .filter { it?.length?: 0 > maxLength }
+            .filter { it?.length ?: 0 > maxLength }
             .map { it?.uppercase() }
             .flatMapMany { it?.let { it1 -> Mono.just(it1) } }
+            .log()
+    }
+
+    fun languageFluxTransform(): Flux<String> {
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLengthOfLanguage }
+        }
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .concatMap { Flux.fromIterable(it.split("")) }
+            .map { it.trim() }
+            .log()
+    }
+
+    fun languageMonoTransform(): Mono<List<String>> {
+        fun filterData(input: Mono<String?>): Mono<String?> {
+            return input?.filter { it?.length ?: 0 > maxLengthOfLanguage }
+        }
+
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .transform { filterData(it) }
+            .map { it?.uppercase() }
+            .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
             .log()
     }
 
