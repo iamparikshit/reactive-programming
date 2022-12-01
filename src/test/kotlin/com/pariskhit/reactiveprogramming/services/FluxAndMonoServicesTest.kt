@@ -115,4 +115,22 @@ class FluxAndMonoServicesTest{
             .expectNextCount(1)
             .verifyComplete()
     }
+
+    @Test
+    fun `should return flux of string with defaultIfEmpty operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxDefaultIfEmpty(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("NEW_LANGUAGE")
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with defaultIfEmpty operator`() {
+        val language = fluxAndMonoServices.languageMonoDefaultIfEmpty(11)
+
+        StepVerifier.create(language)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
 }

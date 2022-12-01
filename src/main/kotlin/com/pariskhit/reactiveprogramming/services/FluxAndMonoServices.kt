@@ -93,4 +93,30 @@ class FluxAndMonoServices {
             .log()
     }
 
+    fun languageFluxDefaultIfEmpty(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .defaultIfEmpty("NEW_LANGUAGE")
+            .log()
+    }
+
+    fun languageMonoDefaultIfEmpty(maxLength : Int = maxLengthOfLanguage): Mono<List<String>> {
+        fun filterData(input: Mono<String?>): Mono<String?> {
+            return input?.filter { it?.length ?: 0 > maxLength }
+        }
+
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .transform { filterData(it) }
+            .map { it?.uppercase() }
+            .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
+            .defaultIfEmpty(listOf("DEFAULT_LANGUAGE"))
+            .log()
+    }
+
 }
