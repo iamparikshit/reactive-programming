@@ -2,6 +2,7 @@ package com.pariskhit.reactiveprogramming.services
 
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.Duration
 
 class FluxAndMonoServices {
     private val languages = listOf("Spanish", "French", "English", "Portuguese", "Russian", "German")
@@ -195,5 +196,55 @@ class FluxAndMonoServices {
             .log()
     }
 
+    fun languageFluxMerge(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        val oldLanguages = Flux.just("Spanish", "German")
+            .delayElements(Duration.ofMillis(90))
+        val newLanguages =  Flux.just("English", "Japanese")
+
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .switchIfEmpty(Flux.merge(oldLanguages,newLanguages))
+            .log()
+    }
+
+    fun languageFluxMergeWith(maxLength : Int = maxLengthOfLanguage): Flux<String> {
+        val oldLanguages = Flux.just("Spanish", "German")
+            .delayElements(Duration.ofMillis(90))
+        val newLanguages =  Flux.just("English", "Japanese")
+
+        fun filterData(input: Flux<String>): Flux<String> {
+            return input.filter { it.length > maxLength }
+        }
+
+        return Flux.fromIterable(languages)
+            .map { it.uppercase() }
+            .transform { filterData(it) }
+            .flatMap { Flux.fromIterable(it.split("")) }
+            .switchIfEmpty(oldLanguages)
+            .mergeWith(newLanguages)
+            .log()
+    }
+
+    fun languageMonoMergeWith(maxLength : Int = maxLengthOfLanguage): Flux<List<String>> {
+        val newLanguages =  Mono.just(listOf("ENGLISH"))
+        fun filterData(input: Mono<String?>): Mono<String?> {
+            return input?.filter { it?.length ?: 0 > maxLength }
+        }
+
+        return Mono.just(languages)
+            .map { it.firstOrNull() }
+            .transform { filterData(it) }
+            .map { it?.uppercase() }
+            .flatMap { it?.let { it1 -> Mono.just(it1.split("")) } }
+            .switchIfEmpty(Mono.just(listOf("DEFAULT_LANGUAGE")).delayElement(Duration.ofSeconds(1)))
+            .mergeWith(newLanguages)
+            .log()
+    }
 
 }

@@ -178,4 +178,31 @@ class FluxAndMonoServicesTest{
             .expectNext(listOf("DEFAULT_LANGUAGE"), listOf("ENGLISH"))
             .verifyComplete()
     }
+
+    @Test
+    fun `should return flux of string with merge operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxMerge(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("English","Japanese","Spanish","German")
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return flux of string with mergeWith operator`() {
+        val languageFlux = fluxAndMonoServices.languageFluxMergeWith(12)
+
+        StepVerifier.create(languageFlux)
+            .expectNext("English","Japanese","Spanish","German")
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should return mono of string with mergeWith operator`() {
+        val language = fluxAndMonoServices.languageMonoMergeWith(11)
+
+        StepVerifier.create(language)
+            .expectNext(listOf("ENGLISH"),listOf("DEFAULT_LANGUAGE"))
+            .verifyComplete()
+    }
 }
