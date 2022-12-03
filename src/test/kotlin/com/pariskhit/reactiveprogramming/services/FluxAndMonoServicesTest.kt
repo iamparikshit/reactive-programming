@@ -212,6 +212,7 @@ class FluxAndMonoServicesTest{
 
         StepVerifier.create(languageFlux)
             .expectNext("Spanish","German","English","Japanese")
+            .expectNextCount(0)
             .verifyComplete()
     }
 }
